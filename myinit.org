@@ -1,0 +1,223 @@
+#+STARTUP: overview
+
+* Startup Configurations
+  #+BEGIN_SRC emacs-lisp
+    (setq inhibit-startup-message t inhibit-starup-echo-area-message t)
+    (menu-bar-mode 1)
+    (tool-bar-mode -1)
+    (load-theme 'wheatgrass)
+  #+END_SRC
+* Interface Changes
+  #+BEGIN_SRC emacs-lisp
+    (fset 'yes-or-no-p 'y-or-n-p)
+    (show-paren-mode 1)
+    (setq show-paren-delay 0)
+    (setq make-backup-files nil)
+
+    (setq completion-ignored-extensions '(".a" ".aux" ".bbl" ".blg" ".dvi" ".elc"
+                        ".lof" ".log" ".lot" ".o" ".toc" "~"))
+    (defun ask-before-closing ()
+      "Ask whether or not to close, and then close if y was pressed"
+      (interactive)
+      (if (y-or-n-p (format "Are you sure you want to exit Emacs? "))
+          (if (< emacs-major-version 22)
+              (save-buffers-kill-terminal)
+            (save-buffers-kill-emacs))
+        (message "Canceled exit")))
+        
+    (when window-system
+      (global-set-key (kbd "C-x C-c") 'ask-before-closing))
+    (setq auto-save-default nil)
+    (setq ring-bell-function 'ignore)
+    (winner-mode 1)
+    (windmove-default-keybindings)
+  #+END_SRC
+* Ido Mode (Overriden by Swiper)
+  #+BEGIN_SRC emacs-lisp
+    (ido-mode 1)
+    (setq ido-enable-flex-matching t)
+    (setq ido-everywhere t)
+    (defalias 'list-buffers 'ibuffer)
+  #+END_SRC
+* Text Mode
+  #+BEGIN_SRC emacs-lisp
+    (setq default-major-mode 'text-mode)
+
+    (add-hook 'text-mode-hook
+         '(lambda () 
+            (auto-fill-mode 0)           ; turn on word-wrap
+            (setq fill-column 75)        ; wrap anything going past here
+            (setq default-tab-width 4)
+            ))
+  #+END_SRC
+* Org-Mode
+  #+BEGIN_SRC emacs-lisp
+    (add-to-list 'auto-mode-alist '("\\.\\(org\\|org_archive\\|txt\\)$" . org-mode))
+    (global-set-key "\C-cl" 'org-store-link)
+    (global-set-key "\C-ca" 'org-agenda)
+    (global-set-key "\C-cb" 'org-iswitchb)
+    (global-set-key (kbd "C-c c") 'org-capture)
+    (setq org-use-fast-todo-selection t)
+    (setq org-directory "~/git/org")
+    (setq org-default-notes-file "~/git/org/refile.org")
+    (setq org-agenda-files (quote ("~/git/org"
+                                   "~/git/org/desres")))
+    (use-package org-bullets
+      :ensure t
+      :config 
+      (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+    )
+    (setq org-src-fontify-natively t)
+    (setq org-src-preserve-indentation nil)
+    (require 'ox-latex)
+    (require 'ox-beamer)
+    (setq org-agenda-files '("~/Projects/DESRES/OrgMode/test.org" "/Users/hunternisonoff/git/org/refile.org"))
+
+  #+END_SRC  
+* Emacs Ipython Notebook
+  #+BEGIN_SRC emacs-lisp
+    (use-package ein
+      :ensure t
+      :config
+      (progn
+        ;;(require 'ein)
+        (setq ein:use-smartrep t)
+        (setq request-backend 'url-retrieve)
+        ;;(setq ein:console-args '("--ssh" "nisonoff@drdlogin0061.en.desres.deshaw.com"))
+        )
+    )
+  #+END_SRC  
+* Flycheck
+  #+BEGIN_SRC emacs-lisp
+    (use-package flycheck
+      :ensure t
+      :init (global-flycheck-mode nil)
+      )
+  #+END_SRC
+* Tramp
+  #+BEGIN_SRC emacs-lisp
+    (setq tramp-default-method "ssh")
+  #+END_SRC
+* Magit
+  (global-set-key (kbd "C-x g") 'magit-status)
+* Paths
+  #+BEGIN_SRC emacs-lisp
+    (add-to-list 'load-path "~/.emacs.d/elpa")
+    (when (memq window-system '(mac ns))
+      (exec-path-from-shell-initialize))
+
+    (global-set-key [remap dabbrev-expand] 'hippie-expand)
+
+    (setq dired-listing-switches "-alh")
+    (setq ring-bell-function 'ignore)
+
+
+    (winner-mode 1)
+    (windmove-default-keybindings)
+  #+END_SRC  
+* Dired
+  #+BEGIN_SRC emacs-lisp
+    (setq dired-listing-switches "-alh")
+  #+END_SRC  
+* Elpy
+  #+BEGIN_SRC emacs-lisp
+    (use-package elpy
+      :ensure t
+      :config 
+      (elpy-enable))
+  #+END_SRC
+* Yasnippet
+  #+BEGIN_SRC emacs-lisp
+    (use-package yasnippet
+      :ensure t
+      :init
+        (yas-global-mode 1))  
+  #+END_SRC
+* Customized Variables
+  #+BEGIN_SRC emacs-lisp
+    ;; (custom-set-variables
+    ;;  ;; custom-set-variables was added by Custom.
+    ;;  ;; If you edit it by hand, you could mess it up, so be careful.
+    ;;  ;; Your init file should contain only one such instance.
+    ;;  ;; If there is more than one, they won't work right.
+    ;;  '(LaTeX-command "latex")
+    ;;  '(TeX-electric-th (quote ("$" . "$")))
+    ;;  '(ansi-color-faces-vector
+    ;;    [default default default italic underline success warning error])
+    ;;  '(ansi-color-names-vector
+    ;;    ["#242424" "#e5786d" "#95e454" "#cae682" "#8ac6f2" "#333366" "#ccaa8f" "#f6f3e8"])
+    ;;  '(custom-enabled-themes (quote (wheatgrass)))
+    ;;  '(default-input-method "TeX")
+    ;;  '(eclim-eclipse-dirs
+    ;;    (quote
+    ;;     ("/Users/hunternisonoff/Dev/Eclipse.app/Contents/Eclipse")))
+    ;;  '(eclim-executable
+    ;;    "/Users/hunternisonoff/Dev/Eclipse.app/Contents/Eclipse/eclim")
+    ;;  '(eclimd-default-workspace "/Users/hunternisonoff/Dev/eclimd_workspace")
+    ;;  '(flycheck-error-list-minimum-level nil)
+    ;;  '(jdee-complete-function (quote jdee-complete-menu))
+    ;;  '(jdee-global-classpath
+    ;;    (quote
+    ;;     ("/Users/hunternisonoff/Projects/DonaldLab/Osprey/OSPREY_refactor/build/classes" "/Users/hunternisonoff/Projects/DonaldLab/Osprey/OSPREY_refactor/build/classes/edu/duke/cs/osprey/astar/ConfTree.class")))
+    ;;  '(jdee-server-dir "/Users/hunternisonoff/Dev/jdee-server/target")
+    ;;  '(org-agenda-files
+    ;;    (quote
+    ;;     ("~/Projects/DESRES/OrgMode/test.org" "/Users/hunternisonoff/git/org/refile.org")))
+    ;;  '(package-selected-packages
+    ;;    (quote
+    ;;     (try ivy counsel ace-window org-bullets meghanada ein smartrep request company-jedi company-anaconda anaconda-mode el-get use-package company-emacs-eclim company gradle-mode eclim ob-ipython markdown-mode company-c-headers ggtags refheap projectile magit flycheck exec-path-from-shell elpy auctex)))
+    ;;  '(request-backend (quote url-retrieve)))
+  #+END_SRC
+* Commented Out
+** Swiper and Avy
+   #+BEGIN_SRC emacs-lisp
+     ;; (use-package counsel
+     ;;   :ensure t
+     ;;   )
+     ;; (use-package ivy
+     ;;   :ensure t
+     ;;   )
+
+     ;; (use-package swiper
+     ;;   :ensure try
+     ;;   :config
+     ;;   (progn
+     ;;     (ivy-mode 1)
+     ;;     (setq ivy-use-virtual-buffers t)
+     ;;     (global-set-key "\C-s" 'swiper)
+     ;;     (global-set-key (kbd "C-c C-r") 'ivy-resume)
+     ;;     (global-set-key (kbd "<f6>") 'ivy-resume)
+     ;;     (global-set-key (kbd "M-x") 'counsel-M-x)
+     ;;     (global-set-key (kbd "C-x C-f") 'counsel-find-file)
+     ;;     (global-set-key (kbd "<f1> f") 'counsel-describe-function)
+     ;;     (global-set-key (kbd "<f1> v") 'counsel-describe-variable)
+     ;;     (global-set-key (kbd "<f1> l") 'counsel-load-library)x
+     ;;     (global-set-key (kbd "<f2> i") 'counsel-info-lookup-symbol)
+     ;;     (global-set-key (kbd "<f2> u") 'counsel-unicode-char)
+     ;;     (global-set-key (kbd "C-c g") 'counsel-git)
+     ;;     (global-set-key (kbd "C-c j") 'counsel-git-grep)
+     ;;     (global-set-key (kbd "C-c k") 'counsel-ag)
+     ;;     (global-set-key (kbd "C-x l") 'counsel-locate)
+     ;;     (global-set-key (kbd "C-S-o") 'counsel-rhythmbox)
+     ;;     (define-key read-expression-map (kbd "C-r") 'counsel-expression-history)
+     ;;     ))
+     ;; (use-package avy 
+     ;;   :ensure t
+     ;;   :bind ("M-s" . avy-goto-char)
+     ;;   )
+   #+END_SRC
+** Python
+   #+BEGIN_SRC emacs-lisp
+     ;; (add-hook 'python-mode-hook 'anaconda-mode)
+     ;; (eval-after-load "company"
+     ;;  '(add-to-list 'company-backends 'company-anaconda))
+     ;; (defun my/python-mode-hook ()
+     ;;   (add-to-list 'company-backends 'company-jedi))
+
+     ;; (add-hook 'python-mode-hook 'my/python-mode-hook)
+     ;; (add-hook 'after-init-hook 'global-company-mode)   
+   #+END_SRC
+** Other
+   #+BEGIN_SRC emacs-lisp
+     ;;(global-set-key [remap dabbrev-expand] 'hippie-expand)
+   #+END_SRC
