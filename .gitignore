@@ -2,6 +2,8 @@
 *
 
 # But not these files...
+!orgfiles/
+!orgfiles/**
 !.gitignore
 !init.el
 !myinit.org
