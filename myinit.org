@@ -205,6 +205,10 @@
       :ensure t
     )
   #+END_SRC
+* Other
+  #+BEGIN_SRC emacs-lisp
+    (global-set-key (kbd "C-x j") (lambda () (interactive) (insert-string "https://drdlogin0061.en.desres.deshaw.com:8888")))
+  #+END_SRC
 * Commented Out
 ** Swiper and Avy
    #+BEGIN_SRC emacs-lisp
