@@ -33,6 +33,7 @@
     (winner-mode 1)
     (windmove-default-keybindings)
   #+END_SRC
+* Themes
 * Ido Mode (Overriden by Swiper)
   #+BEGIN_SRC emacs-lisp
     (ido-mode 1)
@@ -59,7 +60,7 @@
     (global-set-key "\C-cb" 'org-iswitchb)
     (global-set-key (kbd "C-c c") 'org-capture)
     (setq org-use-fast-todo-selection t)
-    (setq org-directory "~/git/org")
+    ;(setq org-directory "~/git/org")
     (setq org-default-notes-file "~/.emacs.d/orgfiles/refile.org")
     (setq org-agenda-files (quote ("~/.emacs.d/orgfiles/agenda.org")))
     (setq org-todo-keywords '("TODO" "STARTED" "WAITING" "DONE"))
@@ -96,6 +97,9 @@
 * Tramp
   #+BEGIN_SRC emacs-lisp
     (setq tramp-default-method "ssh")
+    (require 'tramp)
+    (push "/ssh:nisonoff@enavxlogin4.en.desres.deshaw.com:/gdn/centos7/0001/x3/prefixes/git/2.15.1-01c7__cf52ff9178ce/bin" tramp-remote-path)
+    (push "/ssh:nisonoff@nisonoff.wks.desres.deshaw.com:/gdn/centos7/0001/x3/prefixes/git/2.15.1-01c7__cf52ff9178ce/bin" tramp-remote-path)
   #+END_SRC
 * Magit
   #+BEGIN_SRC emacs-lisp
@@ -125,7 +129,12 @@
     (use-package elpy
       :ensure t
       :config 
-      (elpy-enable))
+      (progn
+        (elpy-enable)
+        (setq elpy-rpc-backend "jedi")
+        ;;(setq ein:console-args '("--ssh" "nisonoff@drdlogin0061.en.desres.deshaw.com"))
+        )
+      )
   #+END_SRC
 * Yasnippet
   #+BEGIN_SRC emacs-lisp
@@ -205,6 +214,10 @@
       :ensure t
     )
   #+END_SRC
+* DocView
+  #+BEGIN_SRC emacs-lisp
+    (setq doc-view-resolution 900)
+  #+END_SRC
 * Other
   #+BEGIN_SRC emacs-lisp
     (global-set-key (kbd "C-x j") (lambda () (interactive) (insert-string "https://drdlogin0061.en.desres.deshaw.com:8888")))
@@ -262,3 +275,90 @@
    #+BEGIN_SRC emacs-lisp
      ;;(global-set-key [remap dabbrev-expand] 'hippie-expand)
    #+END_SRC
+* Ipython
+  #+BEGIN_SRC elisp
+    (setq python-shell-interpreter "ipython"
+       python-shell-interpreter-args "--simple-prompt -i")
+  #+END_SRC
+* Elfeed
+  #+BEGIN_SRC emacs-lisp
+            (use-package elfeed
+              :ensure t
+              :config 
+              (progn
+                (setq elfeed-feeds
+                      '("http://planet.emacsen.org/atom.xml"
+                        "http://blogs.sciencemag.org/pipeline/feed"
+                        "http://bair.berkeley.edu/blog/feed.xml"
+                        )
+                      )
+                (add-hook 'elfeed-new-entry-hook
+                          (elfeed-make-tagger :feed-url "http://blogs.sciencemag.org/pipeline/feed"
+                                              :add '(science)))
+                (add-hook 'elfeed-new-entry-hook
+                          (elfeed-make-tagger :feed-url "http://bair.berkeley.edu/blog/feed.xml"
+                                              :add '(ml)))
+                )
+              )
+  #+END_SRC
+* Auctex
+  # #+BEGIN_SRC emacs-lisp
+  #   (use-package auctex
+  #     :ensure t
+  #   )
+  # #+END_SRC
+* Projectile
+  #+BEGIN_SRC emacs-lisp
+      ;; projectile
+    (use-package projectile
+      :ensure t
+      :config
+      (projectile-global-mode)
+    (setq projectile-completion-system 'ivy))
+  #+END_SRC
+* Which-key
+  #+BEGIN_SRC emacs-lisp
+    (use-package which-key
+      :ensure t
+      :config
+
+      (which-key-setup-side-window-right)
+    )
+  #+END_SRC
+* Dumb-jump
+  #+BEGIN_SRC emacs-lisp
+    (use-package dumb-jump
+      :bind (("M-g o" . dumb-jump-go-other-window)
+         ("M-g j" . dumb-jump-go)
+         ("M-g x" . dumb-jump-go-prefer-external)
+         ("M-g z" . dumb-jump-go-prefer-external-other-window))
+       :config (setq dumb-jump-selector 'ivy) ;; (setq dumb-jump-selector 'helm)
+      :ensure)
+  #+END_SRC
+* Git-gutter
+  #+BEGIN_SRC emacs-lisp
+    (use-package git-gutter
+      :ensure t
+      :config
+      (progn 
+       (global-git-gutter-mode 1)
+       ;; If you would like to use git-gutter.el and linum-mode
+       ;;(git-gutter:linum-setup)
+       
+       (global-set-key (kbd "C-x C-g") 'git-gutter)
+       (global-set-key (kbd "C-x v =") 'git-gutter:popup-hunk)
+
+       ;; Jump to next/previous hunk
+       (global-set-key (kbd "C-x p") 'git-gutter:previous-hunk)
+       (global-set-key (kbd "C-x n") 'git-gutter:next-hunk)
+
+       ;; Stage current hunk
+       (global-set-key (kbd "C-x v s") 'git-gutter:stage-hunk)
+
+       ;; Revert current hunk
+       (global-set-key (kbd "C-x v r") 'git-gutter:revert-hunk)
+
+       ;; Mark current hunk
+       (global-set-key (kbd "C-x v SPC") #'git-gutter:mark-hunk)
+    ))
+  #+END_SRC

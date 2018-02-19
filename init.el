@@ -19,3 +19,17 @@
 
 
 (org-babel-load-file (expand-file-name "~/.emacs.d/myinit.org"))
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages
+   (quote
+	(git-gutter dumb-jump which-key counsel-projectile elfeed spacemacs-theme wanderlust w3m use-package try smex smartrep refheap projectile org-bullets ob-ipython meghanada markdown-mode magit gradle-mode ggtags exwm exec-path-from-shell elpy el-get ein counsel company-jedi company-emacs-eclim company-c-headers company-anaconda auctex ace-window))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
