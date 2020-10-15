@@ -1,0 +1,29 @@
+* Personal
+** Tasks
+*** DONE Figure out apartment finances
+    SCHEDULED: <2018-09-01 Sat>
+*** DONE Letter of recommendation reminder to Terry
+*** DONE Email Gavi
+*** NEXT  
+    DEADLINE: <2020-06-14 Sun>
+** Meetings
+*** DONE Guitar Lesson
+    SCHEDULED: <2018-08-08 Wed 19:30-20:30>
+*** DONE Therapy
+    SCHEDULED: <2018-08-08 Wed 17:00-18:00>
+** Friends
+*** DONE Follow up with Ava about walking Dilly
+    SCHEDULED: <2018-08-23 Thu>
+*** DONE Call Michael to discuss his venture with a focus of offering help without receiving anything in return    
+    SCHEDULED: <2018-08-12 Sun>
+** Graduate School / Jobs
+   - Apply to Benevolent AI
+   - Email Alpha Lee
+   - Apply to Google ML Fellow
+   - Apply to Facebook AI ML Fellow
+   - Apply to OpenAI
+   - Email Terry
+   - Email Bruce
+* Work
+** Task
+   

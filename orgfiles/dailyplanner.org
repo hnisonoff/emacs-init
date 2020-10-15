@@ -1,0 +1,14 @@
+* Work
+** TODO Learn about org mode to get organized
+* Berkeley
+  
+* To Watch
+** PyCon https://pyvideo.org/pycon-us-2019/faster-python-programs-measure-dont-guess.html
+** PyCon https://pyvideo.org/pycon-us-2019/ipython-and-jupyter-in-depth-high-productivity-interactive-python.html
+* TODO General
+  - [ ] Reimburse Chen/Arocho
+    - Four claims 08/08/18 to 08/29/18
+  - [ ] Handle expenses from trip
+  - [ ] Watch MLSS videos
+  - [ ] Get rid of wells fargo
+

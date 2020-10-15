@@ -4,19 +4,6 @@
 ;; just comment it out by adding a semicolon to the start of the line.
 ;; You may delete these explanatory comments.
 
-;;; Code:
-(require 'package)
-(setq package-enable-at-startup nil)
-(add-to-list 'package-archives
-             '("melpa" . "https://melpa.org/packages/"))
-
-(package-initialize)
-
-;; Bootstrap `use-package'
-(unless (package-installed-p 'use-package)
-  (package-refresh-contents)
-  (package-install 'use-package))
-
 
 (org-babel-load-file (expand-file-name "~/.emacs.d/myinit.org"))
 (custom-set-variables
@@ -24,12 +11,19 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(conda-anaconda-home "/Users/hunternisonoff/anaconda3")
+ '(ein:output-area-inlined-images t)
+ '(markdown-command "/usr/local/bin/multimarkdown")
  '(package-selected-packages
-   (quote
-	(git-gutter dumb-jump which-key counsel-projectile elfeed spacemacs-theme wanderlust w3m use-package try smex smartrep refheap projectile org-bullets ob-ipython meghanada markdown-mode magit gradle-mode ggtags exwm exec-path-from-shell elpy el-get ein counsel company-jedi company-emacs-eclim company-c-headers company-anaconda auctex ace-window))))
+   '(column-enforce-mode column-marker jupyter emacs-jupyter poly-R poly-markdown modus-vivendi-theme modus-operandi-theme eglot company-quickhelp company-try-hard company-web company-statistics ein multi-term ox-gfm latex-math-preview curl anki-connect anki-editor anki-mode lsp-julia julia-lsp magit pdf-tools latex-preview-pane zenburn-theme which-key use-package symon request-deferred org-bullets lsp-ui lsp-python-ms git-gutter flymd flycheck fireplace exec-path-from-shell ess elpy elfeed counsel conda company-lsp auctex anaconda-mode ag))
+ '(pdf-tools-handle-upgrades nil)
+ '(preview-transparent-color "white")
+ '(show-paren-mode t)
+ '(tool-bar-mode nil))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(preview-face ((t (:background "white"))))
+ '(preview-reference-face ((t (:background "white")))))

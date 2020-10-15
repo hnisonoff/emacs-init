@@ -1,0 +1,19 @@
+* Genome Hypermobility by Lateral Transduction
+  - Bacteria can bypass the generation-by-generation evolutionary process of shuttling genetic information through a process known as transduction
+  - Transduction occurs via bacteriophages, viruses that infect different bacteria strains, allowing the sharing of genetic information
+  - General transduction occurs due to the presence of homologous start-
+    and end- sites in the host genome. This leads to the occasional copying
+    of host DNA into another bacterium's genome
+  - Specialized tranduction occurs when the bacterial DNA lies dormant in
+    the host genome as a prophage. During activation, the prophage cuts
+    itself out and errors result in nearby host DNA being transferred.
+  - Chen and Penades demonstrated a new type of transuction, called
+    "lateral transduction". Here, packaging occurs before excision over
+    multiple generations. Contiguous host genome DNA is packaged along with
+    the virus.
+  - Lateral transduction can result in the transfer of hundreds of kilobases of host DNA
+  - Lateral transduction may explain the occurance of "pathogenecity
+    islands", regions of the host DNA that render them resistant to
+    antibiotics, but are very different from non-pathogenic close
+    relatives.
+  - [[file:~/Documents/Papers/Biology/Microbiology/genome_hypermobility_by_lateral_transduction.pdf][file:~/Documents/Papers/Biology/Microbiology/genome_hypermobility_by_lateral_transduction.pdf]]

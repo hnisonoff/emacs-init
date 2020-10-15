@@ -1,17 +1,28 @@
 #+STARTUP: overview
-
-* Startup Configurations
+* Packages
   #+BEGIN_SRC emacs-lisp
-    (add-to-list 'default-frame-alist '(fullscreen . maximized))
-    (setq inhibit-startup-message t inhibit-starup-echo-area-message t)
-    (menu-bar-mode 1)
-    (tool-bar-mode -1)
-    (load-theme 'wheatgrass)
+    (setq package-archives
+	  '(("GNU ELPA"     . "https://elpa.gnu.org/packages/")
+	    ("MELPA Stable" . "https://stable.melpa.org/packages/")
+	    ("MELPA"        . "https://melpa.org/packages/"))
+	  package-archive-priorities
+	  '(("MELPA Stable" . 0)
+	    ("GNU ELPA"     . 5)
+	    ("MELPA"        . 10)))
+    (require 'package)
+    (package-initialize)
+  #+END_SRC
+* Use Package
+  #+BEGIN_SRC emacs-lisp
+    (unless (package-installed-p 'use-package)
+      (package-refresh-contents)
+      (package-install 'use-package))
   #+END_SRC
 * Interface Changes
   #+BEGIN_SRC emacs-lisp
     (fset 'yes-or-no-p 'y-or-n-p)
     (show-paren-mode 1)
+    (setq-default indent-tabs-mode nil)
     (setq show-paren-delay 0)
     (setq make-backup-files nil)
 
@@ -25,7 +36,7 @@
               (save-buffers-kill-terminal)
             (save-buffers-kill-emacs))
         (message "Canceled exit")))
-        
+
     (when window-system
       (global-set-key (kbd "C-x C-c") 'ask-before-closing))
     (setq auto-save-default nil)
@@ -33,7 +44,6 @@
     (winner-mode 1)
     (windmove-default-keybindings)
   #+END_SRC
-* Themes
 * Ido Mode (Overriden by Swiper)
   #+BEGIN_SRC emacs-lisp
     (ido-mode 1)
@@ -41,7 +51,7 @@
     (setq ido-everywhere t)
     (defalias 'list-buffers 'ibuffer)
   #+END_SRC
-* Text Mode
+#* Text Mode
   #+BEGIN_SRC emacs-lisp
     (setq default-major-mode 'text-mode)
 
@@ -52,64 +62,55 @@
             (setq default-tab-width 4)
             ))
   #+END_SRC
-* Org-Mode
+;;* Org-Mode
   #+BEGIN_SRC emacs-lisp
+    (setq org-startup-folded 'nil)
+    (setq org-format-latex-options (plist-put org-format-latex-options :scale 1.5))
     (add-to-list 'auto-mode-alist '("\\.\\(org\\|org_archive\\|txt\\)$" . org-mode))
     (global-set-key "\C-cl" 'org-store-link)
     (global-set-key "\C-ca" 'org-agenda)
     (global-set-key "\C-cb" 'org-iswitchb)
     (global-set-key (kbd "C-c c") 'org-capture)
-    (setq org-use-fast-todo-selection t)
-    ;(setq org-directory "~/git/org")
-    (setq org-default-notes-file "~/.emacs.d/orgfiles/refile.org")
-    (setq org-agenda-files (quote ("~/.emacs.d/orgfiles/agenda.org")))
+    (setq org-capture-templates
+	   '(("t" "todo" entry (file org-default-notes-file)
+	       "* TODO %?\n%u\n%a\n" :clock-in t :clock-resume t)
+	     ("m" "Meeting" entry (file org-default-notes-file)
+	      "* MEETING with %? :MEETING:\n%t" :clock-in t :clock-resume t)
+	     ("d" "Diary" entry (file+datetree "~/.emacs.d/orgfiles/diary.org")
+	      "* %?\n%U\n" :clock-in t :clock-resume t)
+	     ("i" "Idea" entry (file org-default-notes-file)
+	      "* %? :IDEA: \n%t" :clock-in t :clock-resume t)
+	     ("n" "Next Task" entry (file+headline org-default-notes-file "Tasks")
+	      "** NEXT %? \nDEADLINE: %t") ))
+    ;; (setq org-capture-templates
+    ;; 	  '(("c" "Code Snippets" entry (file+headline  "~/.emacs.d/orgfiles/code.org" "Code Snippets:")
+    ;; 		 "* %?\n%T")))
+    ;; (setq org-use-fast-todo-selection t)
+    (setq org-directory "~/.emacs.d/orgifiles/")
+    (setq org-default-notes-file "~/.emacs.d/orgfiles/mylife.org")
+    (setq org-agenda-files (quote ("~/.emacs.d/orgfiles/mylife.org")))
     (setq org-todo-keywords '("TODO" "STARTED" "WAITING" "DONE"))
+    (org-babel-do-load-languages
+       'org-babel-load-languages
+	      '((calc . t)))
+
     (use-package org-bullets
       :ensure t
       :config 
       (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
-    )
+      )
     (setq org-src-fontify-natively t)
     (setq org-src-preserve-indentation nil)
-    (require 'ox-latex)
-    (require 'ox-beamer)
   #+END_SRC  
-* Emacs Ipython Notebook
-  #+BEGIN_SRC emacs-lisp
-    (use-package ein
-      :ensure t
-      :config
-      (progn
-        ;;(require 'ein)
-        (setq ein:use-smartrep t)
-        (setq request-backend 'url-retrieve)
-        ;;(setq ein:console-args '("--ssh" "nisonoff@drdlogin0061.en.desres.deshaw.com"))
-        )
-    )
-  #+END_SRC  
-* Flycheck
-  #+BEGIN_SRC emacs-lisp
-    (use-package flycheck
-      :ensure t
-      :init (global-flycheck-mode nil)
-      )
-  #+END_SRC
-* Tramp
-  #+BEGIN_SRC emacs-lisp
-    (setq tramp-default-method "ssh")
-    (require 'tramp)
-    (push "/ssh:nisonoff@enavxlogin4.en.desres.deshaw.com:/gdn/centos7/0001/x3/prefixes/git/2.15.1-01c7__cf52ff9178ce/bin" tramp-remote-path)
-    (push "/ssh:nisonoff@nisonoff.wks.desres.deshaw.com:/gdn/centos7/0001/x3/prefixes/git/2.15.1-01c7__cf52ff9178ce/bin" tramp-remote-path)
-  #+END_SRC
 * Magit
   #+BEGIN_SRC emacs-lisp
-    (global-set-key (kbd "C-x g") 'magit-status)
+    (use-package magit
+      :ensure t
+      :bind (("C-x g" . magit-status)))
   #+END_SRC  
 * Paths
   #+BEGIN_SRC emacs-lisp
     (add-to-list 'load-path "~/.emacs.d/elpa")
-    (when (memq window-system '(mac ns))
-      (exec-path-from-shell-initialize))
 
     (global-set-key [remap dabbrev-expand] 'hippie-expand)
 
@@ -124,59 +125,12 @@
   #+BEGIN_SRC emacs-lisp
     (setq dired-listing-switches "-alh")
   #+END_SRC  
-* Elpy
-  #+BEGIN_SRC emacs-lisp
-    (use-package elpy
-      :ensure t
-      :config 
-      (progn
-        (elpy-enable)
-        (setq elpy-rpc-backend "jedi")
-        ;;(setq ein:console-args '("--ssh" "nisonoff@drdlogin0061.en.desres.deshaw.com"))
-        )
-      )
-  #+END_SRC
 * Yasnippet
   #+BEGIN_SRC emacs-lisp
     (use-package yasnippet
       :ensure t
       :init
         (yas-global-mode 1))  
-  #+END_SRC
-* Customized Variables
-  #+BEGIN_SRC emacs-lisp
-    ;; (custom-set-variables
-    ;;  ;; custom-set-variables was added by Custom.
-    ;;  ;; If you edit it by hand, you could mess it up, so be careful.
-    ;;  ;; Your init file should contain only one such instance.
-    ;;  ;; If there is more than one, they won't work right.
-    ;;  '(LaTeX-command "latex")
-    ;;  '(TeX-electric-th (quote ("$" . "$")))
-    ;;  '(ansi-color-faces-vector
-    ;;    [default default default italic underline success warning error])
-    ;;  '(ansi-color-names-vector
-    ;;    ["#242424" "#e5786d" "#95e454" "#cae682" "#8ac6f2" "#333366" "#ccaa8f" "#f6f3e8"])
-    ;;  '(custom-enabled-themes (quote (wheatgrass)))
-    ;;  '(default-input-method "TeX")
-    ;;  '(eclim-eclipse-dirs
-    ;;    (quote
-    ;;     ("/Users/hunternisonoff/Dev/Eclipse.app/Contents/Eclipse")))
-    ;;  '(eclim-executable
-    ;;    "/Users/hunternisonoff/Dev/Eclipse.app/Contents/Eclipse/eclim")
-    ;;  '(eclimd-default-workspace "/Users/hunternisonoff/Dev/eclimd_workspace")
-    ;;  '(flycheck-error-list-minimum-level nil)
-    ;;  '(jdee-complete-function (quote jdee-complete-menu))
-    ;;  '(jdee-global-classpath
-    ;;    (quote
-    ;;     ("/Users/hunternisonoff/Projects/DonaldLab/Osprey/OSPREY_refactor/build/classes" "/Users/hunternisonoff/Projects/DonaldLab/Osprey/OSPREY_refactor/build/classes/edu/duke/cs/osprey/astar/ConfTree.class")))
-    ;;  '(jdee-server-dir "/Users/hunternisonoff/Dev/jdee-server/target")
-    ;;  '(org-agenda-files
-    ;;    (quote
-    ;;     ("~/Projects/DESRES/OrgMode/test.org" "/Users/hunternisonoff/git/org/refile.org")))
-    ;;  '(package-selected-packages
-    ;;    (quote
-    ;;     (try ivy counsel ace-window org-bullets meghanada ein smartrep request company-jedi company-anaconda anaconda-mode el-get use-package company-emacs-eclim company gradle-mode eclim ob-ipython markdown-mode company-c-headers ggtags refheap projectile magit flycheck exec-path-from-shell elpy auctex)))
-    ;;  '(request-backend (quote url-retrieve)))
   #+END_SRC
 * Swiper
   #+BEGIN_SRC emacs-lisp
@@ -208,157 +162,381 @@
         (define-key read-expression-map (kbd "C-r") 'counsel-expression-history)
         ))
   #+END_SRC
-* Wanderlust
+* Paragraph Fill
   #+BEGIN_SRC emacs-lisp
-    (use-package wanderlust
-      :ensure t
-    )
-  #+END_SRC
-* DocView
-  #+BEGIN_SRC emacs-lisp
-    (setq doc-view-resolution 900)
-  #+END_SRC
-* Other
-  #+BEGIN_SRC emacs-lisp
-    (global-set-key (kbd "C-x j") (lambda () (interactive) (insert-string "https://drdlogin0061.en.desres.deshaw.com:8888")))
-  #+END_SRC
-* Commented Out
-** Swiper and Avy
-   #+BEGIN_SRC emacs-lisp
-     ;; (use-package counsel
-     ;;   :ensure t
-     ;;   )
-     ;; (use-package ivy
-     ;;   :ensure t
-     ;;   )
-
-     ;; (use-package swiper
-     ;;   :ensure try
-     ;;   :config
-     ;;   (progn
-     ;;     (ivy-mode 1)
-     ;;     (setq ivy-use-virtual-buffers t)
-     ;;     (global-set-key "\C-s" 'swiper)
-     ;;     (global-set-key (kbd "C-c C-r") 'ivy-resume)
-     ;;     (global-set-key (kbd "<f6>") 'ivy-resume)
-     ;;     (global-set-key (kbd "M-x") 'counsel-M-x)
-     ;;     (global-set-key (kbd "C-x C-f") 'counsel-find-file)
-     ;;     (global-set-key (kbd "<f1> f") 'counsel-describe-function)
-     ;;     (global-set-key (kbd "<f1> v") 'counsel-describe-variable)
-     ;;     (global-set-key (kbd "<f1> l") 'counsel-load-library)x
-     ;;     (global-set-key (kbd "<f2> i") 'counsel-info-lookup-symbol)
-     ;;     (global-set-key (kbd "<f2> u") 'counsel-unicode-char)
-     ;;     (global-set-key (kbd "C-c g") 'counsel-git)
-     ;;     (global-set-key (kbd "C-c j") 'counsel-git-grep)
-     ;;     (global-set-key (kbd "C-c k") 'counsel-ag)
-     ;;     (global-set-key (kbd "C-x l") 'counsel-locate)
-     ;;     (global-set-key (kbd "C-S-o") 'counsel-rhythmbox)
-     ;;     (define-key read-expression-map (kbd "C-r") 'counsel-expression-history)
-     ;;     ))
-     ;; (use-package avy 
-     ;;   :ensure t
-     ;;   :bind ("M-s" . avy-goto-char)
-     ;;   )
-   #+END_SRC
-** Python
-   #+BEGIN_SRC emacs-lisp
-     ;; (add-hook 'python-mode-hook 'anaconda-mode)
-     ;; (eval-after-load "company"
-     ;;  '(add-to-list 'company-backends 'company-anaconda))
-     ;; (defun my/python-mode-hook ()
-     ;;   (add-to-list 'company-backends 'company-jedi))
-
-     ;; (add-hook 'python-mode-hook 'my/python-mode-hook)
-     ;; (add-hook 'after-init-hook 'global-company-mode)   
-   #+END_SRC
-** Other
-   #+BEGIN_SRC emacs-lisp
-     ;;(global-set-key [remap dabbrev-expand] 'hippie-expand)
-   #+END_SRC
-* Ipython
-  #+BEGIN_SRC elisp
-    (setq python-shell-interpreter "ipython"
-       python-shell-interpreter-args "--simple-prompt -i")
+	(defun refill-paragraphs-to-be-one-line ()
+	  "fill individual paragraphs with large fill column"
+	  (interactive)
+	  (let ((fill-column 100000))
+		(fill-individual-paragraphs (point-min) (point-max))))
   #+END_SRC
 * Elfeed
   #+BEGIN_SRC emacs-lisp
-            (use-package elfeed
-              :ensure t
-              :config 
-              (progn
-                (setq elfeed-feeds
-                      '("http://planet.emacsen.org/atom.xml"
-                        "http://blogs.sciencemag.org/pipeline/feed"
-                        "http://bair.berkeley.edu/blog/feed.xml"
-                        )
-                      )
-                (add-hook 'elfeed-new-entry-hook
-                          (elfeed-make-tagger :feed-url "http://blogs.sciencemag.org/pipeline/feed"
-                                              :add '(science)))
-                (add-hook 'elfeed-new-entry-hook
-                          (elfeed-make-tagger :feed-url "http://bair.berkeley.edu/blog/feed.xml"
-                                              :add '(ml)))
-                )
-              )
+	(use-package elfeed
+	  :ensure t
+	  :bind ("C-x w" . elfeed)
+	  :config 
+	  (progn
+		(setq elfeed-feeds
+			  '("http://planet.emacsen.org/atom.xml"
+				"http://blogs.sciencemag.org/pipeline/feed"
+				"http://bair.berkeley.edu/blog/feed.xml"
+				"http://practicalfragments.blogspot.com/feeds/posts/default"
+				"http://feeds.feedburner.com/blogspot/gJZg"
+				"https://deepmind.com/blog/feed/basic/"
+				"https://www.theatlantic.com/feed/all/"
+				)
+			  )
+		(add-hook 'elfeed-new-entry-hook
+				  (elfeed-make-tagger :feed-url "http://blogs.sciencemag.org/pipeline/feed"
+									  :add '(science)))
+		(add-hook 'elfeed-new-entry-hook
+				  (elfeed-make-tagger :feed-url "http://practicalfragments.blogspot.com/feeds/posts/default"
+									  :add '(science)))
+		(add-hook 'elfeed-new-entry-hook
+				  (elfeed-make-tagger :feed-url "http://bair.berkeley.edu/blog/feed.xml"
+									  :add '(ml)))
+		(add-hook 'elfeed-new-entry-hook
+				  (elfeed-make-tagger :feed-url "https://deepmind.com/blog/feed/basic/"
+									  :add '(ml)))
+  
+		(defadvice elfeed-search-update (before nullprogram activate)
+		  (let ((feed (elfeed-db-get-feed "https://deepmind.com/blog/feed/basic/")))
+			(setf (elfeed-feed-title feed) "DeepMind")))
+		)
+	  )
   #+END_SRC
-* Auctex
-  # #+BEGIN_SRC emacs-lisp
-  #   (use-package auctex
-  #     :ensure t
-  #   )
-  # #+END_SRC
-* Projectile
-  #+BEGIN_SRC emacs-lisp
-      ;; projectile
-    (use-package projectile
-      :ensure t
-      :config
-      (projectile-global-mode)
-    (setq projectile-completion-system 'ivy))
-  #+END_SRC
-* Which-key
-  #+BEGIN_SRC emacs-lisp
-    (use-package which-key
-      :ensure t
-      :config
 
-      (which-key-setup-side-window-right)
-    )
-  #+END_SRC
-* Dumb-jump
+* Ibuffer
   #+BEGIN_SRC emacs-lisp
-    (use-package dumb-jump
-      :bind (("M-g o" . dumb-jump-go-other-window)
-         ("M-g j" . dumb-jump-go)
-         ("M-g x" . dumb-jump-go-prefer-external)
-         ("M-g z" . dumb-jump-go-prefer-external-other-window))
-       :config (setq dumb-jump-selector 'ivy) ;; (setq dumb-jump-selector 'helm)
-      :ensure)
+	(global-set-key (kbd "C-x C-b") 'ibuffer)
+	(setq ibuffer-saved-filter-groups
+		  (quote (("default"
+			   ("dired" (mode . dired-mode))
+			   ("org" (name . "^.*org$"))
+			   ("shell" (or (mode . eshell-mode) (mode . shell-mode)))
+			   ("programming" (or
+					   (mode . python-mode)
+					   (mode . c++-mode)))
+			   ("ein" (or 
+					   (name . "^\\*ein: https:*")
+					   (name . "^\\*ein:notebooklist*")
+					   ))
+			   ("htop" (name . "^htop*"))
+			   ("jupyter" (name . "^jupyter*"))
+			   ("emacs" (or
+				 (name . "^\\*scratch\\*$")
+				 (name . "^\\*Messages\\*$")))
+			   ))))
+	(add-hook 'ibuffer-mode-hook
+		  (lambda ()
+			(ibuffer-auto-mode 1)
+			(ibuffer-switch-to-saved-filter-groups "default")))
+	;; nearly all of this is the default layout
+	(setq ibuffer-formats 
+		  '((mark modified read-only " "
+				  (name 65 65 :left :elide) ; change: 65s were originally 18s
+				  " "
+				  (size 9 -1 :right)
+				  " "
+				  (mode 16 16 :left :elide)
+				  " " filename-and-process)
+			(mark " "
+				  (name 16 -1)
+				  " " filename)))
+	;; don't show these
+						;(add-to-list 'ibuffer-never-show-predicates "zowie")
+	;; Don't show filter groups if there are no buffers in that group
+	(setq ibuffer-show-empty-filter-groups nil)
+
+	;; Don't ask for confirmation to delete marked buffers
+	(setq ibuffer-expert t)
   #+END_SRC
 * Git-gutter
   #+BEGIN_SRC emacs-lisp
-    (use-package git-gutter
+	(use-package git-gutter
+	  :ensure t
+	  :config
+	  (progn
+		(global-git-gutter-mode +1)
+		(global-git-gutter-mode t)
+
+		(global-set-key (kbd "C-x C-g") 'git-gutter)
+		(global-set-key (kbd "C-x v =") 'git-gutter:popup-hunk)
+
+		;; Jump to next/previous hunk
+		(global-set-key (kbd "C-x p") 'git-gutter:previous-hunk)
+		(global-set-key (kbd "C-x n") 'git-gutter:next-hunk)
+
+		;; Stage current hunk
+		(global-set-key (kbd "C-x v s") 'git-gutter:stage-hunk)
+
+		;; Revert current hunk
+		(global-set-key (kbd "C-x v r") 'git-gutter:revert-hunk)
+
+		;; Mark current hunk
+		(global-set-key (kbd "C-x v SPC") #'git-gutter:mark-hunk)	
+	)
+	)
+  #+END_SRC
+* Which-key
+  #+BEGIN_SRC emacs-lisp
+	(use-package which-key
+	  :ensure t
+	  :config 
+	  (which-key-mode)
+	  )
+  #+END_SRC
+* Swith-remote
+  #+BEGIN_SRC emacs-lisp
+    (defun switch-remote ()
+      "Ask whether or not to close, and then close if y was pressed"
+      (interactive)
+      (let* ((file (dired-copy-filename-as-kill)))
+	    (find-file (concat "/ssh:nisonoff@enavxlogin4.en.desres.deshaw.com:" file))))
+
+
+    (global-set-key (kbd "C-c r") 'switch-remote)
+
+  #+END_SRC
+* Nsh
+  #+BEGIN_SRC emacs-lisp
+	;; Emacs, please load my new powerful nsh function
+	(add-to-list 'load-path "~/.emacs.d/huntercode")
+	(require 'nsh)
+  #+END_SRC
+* Zenburn
+  #+BEGIN_SRC emacs-lisp
+    (use-package zenburn-theme
       :ensure t
       :config
-      (progn 
-       (global-git-gutter-mode 1)
-       ;; If you would like to use git-gutter.el and linum-mode
-       ;;(git-gutter:linum-setup)
-       
-       (global-set-key (kbd "C-x C-g") 'git-gutter)
-       (global-set-key (kbd "C-x v =") 'git-gutter:popup-hunk)
+      (load-theme 'zenburn t))
 
-       ;; Jump to next/previous hunk
-       (global-set-key (kbd "C-x p") 'git-gutter:previous-hunk)
-       (global-set-key (kbd "C-x n") 'git-gutter:next-hunk)
 
-       ;; Stage current hunk
-       (global-set-key (kbd "C-x v s") 'git-gutter:stage-hunk)
+    ;; (use-package modus-operandi-theme
+    ;;   :ensure t)
 
-       ;; Revert current hunk
-       (global-set-key (kbd "C-x v r") 'git-gutter:revert-hunk)
+    ;; (use-package modus-vivendi-theme
+    ;;   :ensure t)
+    ;; ;;(load-theme 'modus-vivendi t)
+    ;; (load-theme 'modus-operandi t)
 
-       ;; Mark current hunk
-       (global-set-key (kbd "C-x v SPC") #'git-gutter:mark-hunk)
-    ))
   #+END_SRC
+* Anaconda
+  #+BEGIN_SRC emacs-lisp
+    (use-package anaconda-mode
+      :ensure t
+      :commands anaconda-mode
+      :diminish anaconda-mode
+      :init
+      (progn
+	(add-hook 'python-mode-hook 'anaconda-mode)
+	(add-hook 'python-mode-hook 'eldoc-mode)))
+  #+END_SRC
+  #+BEGIN_SRC emacs-lisp
+    (use-package conda
+      :ensure t
+      :init
+      (progn
+	(require 'conda)
+	;; if you want interactive shell support, include:
+	(conda-env-initialize-interactive-shells)
+	;; if you want eshell support, include:
+	(conda-env-initialize-eshell)
+	;; if you want auto-activation (see below for details), include:
+	(conda-env-autoactivate-mode t)
+	;(setq conda-env-home-directory (expand-file-name "~/anaconda3/envs")
+	;;(setq conda-env-home-directory (expand-file-name "/Users/hunternisonoff/anaconda3/")
+        (setq conda-env-home-directory (expand-file-name "~/anaconda3/")
+	)
+      (custom-set-variables
+       '(conda-anaconda-home "~/anaconda3"))
+    ))
+    (setenv "WORKON_HOME" "~/anaconda3/envs")
+  #+END_SRC
+* Auctex
+  #+BEGIN_SRC emacs-lisp
+    (use-package tex-mode
+      :ensure auctex
+    )
+  #+END_SRC
+* Exec path from shell
+  #+BEGIN_SRC emacs-lisp
+    (use-package exec-path-from-shell
+      :ensure t
+      :init 
+      (when (memq window-system '(mac ns))
+      (exec-path-from-shell-initialize)))
+
+  #+END_SRC
+* Unfill paragraph
+  #+BEGIN_SRC emacs-lisp
+    (defun unfill-paragraph (&optional region)
+      "Takes a multi-line paragraph and makes it into a single line of text."
+      (interactive (progn (barf-if-buffer-read-only) '(t)))
+      (let ((fill-column (point-max))
+	    ;; This would override `fill-column' if it's an integer.
+	    (emacs-lisp-docstring-fill-column t))
+	(fill-paragraph nil region)))
+    (define-key global-map "\M-Q" 'unfill-paragraph)
+  #+END_SRC
+* Julia
+ #+BEGIN_SRC emacs-lisp
+   (use-package julia-mode
+     :ensure t
+     )
+     (add-to-list 'auto-mode-alist '("\\.julia$" . julia-mode))
+     (add-to-list 'auto-mode-alist '("\\.jl$" . julia-mode))
+
+  #+END_SRC
+* Access init file
+  #+BEGIN_SRC emacs-lisp
+  (defun access-init ()
+      (interactive)
+      (find-file "/Users/hunternisonoff/.emacs.d/myinit.org"))
+    (global-set-key (kbd "C-c i") 'access-init)
+  #+END_SRC
+* Shell Name
+  #+BEGIN_SRC emacs-lisp
+    (defun shell-name (nsh-name)
+      (interactive "Mshell name: ")
+      (shell (concat "shell-" nsh-name)))
+    (global-set-key (kbd "C-c t") 'shell-name)
+  #+END_SRC
+* Savio
+    #+BEGIN_SRC emacs-lisp
+      (defun access-savio ()
+        (interactive)
+        (find-file "/ssh:hunter_nisonoff@hpc.brc.berkeley.edu:~"))
+      (global-set-key (kbd "C-c s") 'access-savio)
+
+
+
+      (defun access-savio ()
+        (interactive)
+        (find-file "/ssh:hunter_nisonoff@hpc.brc.berkeley.edu:~"))
+      (global-set-key (kbd "C-c s") 'access-savio)
+
+      (defun access-savio-scratch ()
+        (interactive)
+        (find-file "/ssh:hunter_nisonoff@hpc.brc.berkeley.edu:/global/scratch/hunter_nisonoff"))
+      (global-set-key (kbd "C-c w") 'access-savio-scratch)
+
+
+
+  #+END_SRC
+* Python Tab
+  #+BEGIN_SRC emacs-lisp
+  (add-hook 'python-mode-hook
+      (lambda ()
+        (setq indent-tabs-mode 'nil)
+        (setq tab-width 4)
+        (setq python-indent-offset 4)))
+  #+END_SRC
+* HP Server
+  #+BEGIN_SRC emacs-lisp
+  (defun hpserver ()
+  (interactive)
+  (find-file "/ssh:hunter_nisonoff@beef.bair.berkeley.edu:/home/hunter_nisonoff"))
+  (global-set-key (kbd "C-c h") 'hpserver)
+  
+  
+  #+END_SRC
+* Font Bigger
+  #+BEGIN_SRC emacs-lisp
+  (set-face-attribute 'default nil :height 150)
+  ;;(set-face-attribute 'default nil :height 150)
+  #+END_SRC
+* Ipython
+  #+BEGIN_SRC emacs-lisp
+    (when (executable-find "ipython")
+      (setq python-shell-interpreter "ipython"))
+
+    (require 'python)
+    (setq python-shell-interpreter "ipython")
+    ;;(setq python-shell-interpreter-args "--pylab")
+    (setq python-shell-interpreter "ipython"
+	  python-shell-interpreter-args "--simple-prompt -i")
+  #+END_SRC
+* ESS
+  #+BEGIN_SRC emacs-lisp
+    (use-package ess
+      :ensure t
+      :config
+      (require 'ess-r-mode)
+      :bind 
+      (:map ess-mode-map
+            (";" . ess-insert-assign))
+      (:map inferior-ess-mode-map
+            (";" . ess-insert-assign)))
+
+    (defun then_R_operator ()
+      "%>% operator or 'then' pipe operator"
+      (interactive)
+      (insert " %>%") ; note the space before the first %
+      (reindent-then-newline-and-indent))
+    (global-set-key (kbd "C-\\") 'then_R_operator)
+  #+END_SRC
+* Emacs Ipython Notebook
+  #+BEGIN_SRC emacs-lisp
+	(use-package ein
+	  :ensure t
+	  :demand t
+	  :config
+	  (progn
+	  (require 'ein)
+	  ;;(setq ein:polymode t)
+          (setq ein:notebook-autosave-frequency 600)
+          ;;(setq ein:output-area-inlined-images t)
+		;;(setq ein:use-smartrep t)
+		;;(setq ein:complete-on-dot nil)
+		;;(setq ein:notebook-create-checkpoint-on-save t)
+		
+		;;(setqe ein:console-args '("--ssh" "nisonoff@drdlogin0061.en.desres.deshaw.com"))
+		)
+	)
+  #+END_SRC    
+* Eglot
+  #+BEGIN_SRC emacs-lisp
+    (use-package eglot
+      :ensure t
+    )
+
+  #+END_SRC
+* Command is meta
+  #+BEGIN_SRC emacs-lisp
+    (setq mac-command-modifier 'meta)
+  #+END_SRC
+* LSP Mode
+  #+BEGIN_SRC emacs-lisp
+    ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
+    (setq lsp-keymap-prefix "s-l")
+
+    (use-package lsp-mode
+        :hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
+                (python-mode . lsp)
+                ;; if you want which-key integration
+                (lsp-mode . lsp-enable-which-key-integration))
+        :commands lsp)
+
+    ;; optionally
+    (use-package lsp-ui :commands lsp-ui-mode)
+    ;; if you are helm user
+    (use-package helm-lsp :commands helm-lsp-workspace-symbol)
+    ;; if you are ivy user
+    (use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
+    (use-package lsp-treemacs :commands lsp-treemacs-errors-list)
+
+    ;; optional if you want which-key integration
+    (use-package which-key
+        :config
+        (which-key-mode))
+
+    (use-package lsp-python-ms
+      :ensure t
+      :init (setq lsp-python-ms-auto-install-server t)
+      :hook (python-mode . (lambda ()
+                              (require 'lsp-python-ms)
+                              (lsp))))  ; or lsp-deferred
+  #+END_SRC
+  

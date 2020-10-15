@@ -1,0 +1,5 @@
+* Git
+** Stash local changes, pull in new changes (rebase if needed), and then pop the changes off the stash
+  #+BEGIN_SRC bash
+    git pull --rebase --autostash
+  #+END_SRC
