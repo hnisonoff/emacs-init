@@ -1,3 +1,0 @@
-* 1
-  - Show the rank of row space equals rank of column space
-    - C R

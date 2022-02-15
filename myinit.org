@@ -2,13 +2,13 @@
 * Packages
   #+BEGIN_SRC emacs-lisp
     (setq package-archives
-	  '(("GNU ELPA"     . "https://elpa.gnu.org/packages/")
-	    ("MELPA Stable" . "https://stable.melpa.org/packages/")
-	    ("MELPA"        . "https://melpa.org/packages/"))
-	  package-archive-priorities
-	  '(("MELPA Stable" . 0)
-	    ("GNU ELPA"     . 5)
-	    ("MELPA"        . 10)))
+          '(("GNU ELPA"     . "https://elpa.gnu.org/packages/")
+            ("MELPA Stable" . "https://stable.melpa.org/packages/")
+            ("MELPA"        . "https://melpa.org/packages/"))
+          package-archive-priorities
+          '(("MELPA Stable" . 0)
+            ("GNU ELPA"     . 5)
+            ("MELPA"        . 10)))
     (require 'package)
     (package-initialize)
   #+END_SRC
@@ -20,11 +20,18 @@
   #+END_SRC
 * Interface Changes
   #+BEGIN_SRC emacs-lisp
+    (defun get-default-height ()
+           (/ (- (display-pixel-height) 120)
+              (frame-char-height)))
+
+    (add-to-list 'default-frame-alist '(width . 157))
+    (add-to-list 'default-frame-alist (cons 'height (get-default-height)))
+
     (fset 'yes-or-no-p 'y-or-n-p)
     (show-paren-mode 1)
     (setq-default indent-tabs-mode nil)
     (setq show-paren-delay 0)
-    (setq make-backup-files nil)
+    ;;(setq make-backup-files nil)
 
     (setq completion-ignored-extensions '(".a" ".aux" ".bbl" ".blg" ".dvi" ".elc"
                         ".lof" ".log" ".lot" ".o" ".toc" "~"))
@@ -43,65 +50,10 @@
     (setq ring-bell-function 'ignore)
     (winner-mode 1)
     (windmove-default-keybindings)
+    (custom-set-variables
+     '(show-paren-mode t)
+     '(tool-bar-mode nil))
   #+END_SRC
-* Ido Mode (Overriden by Swiper)
-  #+BEGIN_SRC emacs-lisp
-    (ido-mode 1)
-    (setq ido-enable-flex-matching t)
-    (setq ido-everywhere t)
-    (defalias 'list-buffers 'ibuffer)
-  #+END_SRC
-#* Text Mode
-  #+BEGIN_SRC emacs-lisp
-    (setq default-major-mode 'text-mode)
-
-    (add-hook 'text-mode-hook
-         '(lambda () 
-            (auto-fill-mode 0)           ; turn on word-wrap
-            (setq fill-column 75)        ; wrap anything going past here
-            (setq default-tab-width 4)
-            ))
-  #+END_SRC
-;;* Org-Mode
-  #+BEGIN_SRC emacs-lisp
-    (setq org-startup-folded 'nil)
-    (setq org-format-latex-options (plist-put org-format-latex-options :scale 1.5))
-    (add-to-list 'auto-mode-alist '("\\.\\(org\\|org_archive\\|txt\\)$" . org-mode))
-    (global-set-key "\C-cl" 'org-store-link)
-    (global-set-key "\C-ca" 'org-agenda)
-    (global-set-key "\C-cb" 'org-iswitchb)
-    (global-set-key (kbd "C-c c") 'org-capture)
-    (setq org-capture-templates
-	   '(("t" "todo" entry (file org-default-notes-file)
-	       "* TODO %?\n%u\n%a\n" :clock-in t :clock-resume t)
-	     ("m" "Meeting" entry (file org-default-notes-file)
-	      "* MEETING with %? :MEETING:\n%t" :clock-in t :clock-resume t)
-	     ("d" "Diary" entry (file+datetree "~/.emacs.d/orgfiles/diary.org")
-	      "* %?\n%U\n" :clock-in t :clock-resume t)
-	     ("i" "Idea" entry (file org-default-notes-file)
-	      "* %? :IDEA: \n%t" :clock-in t :clock-resume t)
-	     ("n" "Next Task" entry (file+headline org-default-notes-file "Tasks")
-	      "** NEXT %? \nDEADLINE: %t") ))
-    ;; (setq org-capture-templates
-    ;; 	  '(("c" "Code Snippets" entry (file+headline  "~/.emacs.d/orgfiles/code.org" "Code Snippets:")
-    ;; 		 "* %?\n%T")))
-    ;; (setq org-use-fast-todo-selection t)
-    (setq org-directory "~/.emacs.d/orgifiles/")
-    (setq org-default-notes-file "~/.emacs.d/orgfiles/mylife.org")
-    (setq org-agenda-files (quote ("~/.emacs.d/orgfiles/mylife.org")))
-    (setq org-todo-keywords '("TODO" "STARTED" "WAITING" "DONE"))
-    (org-babel-do-load-languages
-       'org-babel-load-languages
-	      '((calc . t)))
-
-    (use-package org-bullets
-      :ensure t
-      :config 
-      (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
-      )
-    (setq org-src-fontify-natively t)
-    (setq org-src-preserve-indentation nil)
-  #+END_SRC  
 * Magit
   #+BEGIN_SRC emacs-lisp
     (use-package magit
@@ -114,10 +66,7 @@
 
     (global-set-key [remap dabbrev-expand] 'hippie-expand)
 
-    (setq dired-listing-switches "-alh")
     (setq ring-bell-function 'ignore)
-
-
     (winner-mode 1)
     (windmove-default-keybindings)
   #+END_SRC  
@@ -170,43 +119,6 @@
 	  (let ((fill-column 100000))
 		(fill-individual-paragraphs (point-min) (point-max))))
   #+END_SRC
-* Elfeed
-  #+BEGIN_SRC emacs-lisp
-	(use-package elfeed
-	  :ensure t
-	  :bind ("C-x w" . elfeed)
-	  :config 
-	  (progn
-		(setq elfeed-feeds
-			  '("http://planet.emacsen.org/atom.xml"
-				"http://blogs.sciencemag.org/pipeline/feed"
-				"http://bair.berkeley.edu/blog/feed.xml"
-				"http://practicalfragments.blogspot.com/feeds/posts/default"
-				"http://feeds.feedburner.com/blogspot/gJZg"
-				"https://deepmind.com/blog/feed/basic/"
-				"https://www.theatlantic.com/feed/all/"
-				)
-			  )
-		(add-hook 'elfeed-new-entry-hook
-				  (elfeed-make-tagger :feed-url "http://blogs.sciencemag.org/pipeline/feed"
-									  :add '(science)))
-		(add-hook 'elfeed-new-entry-hook
-				  (elfeed-make-tagger :feed-url "http://practicalfragments.blogspot.com/feeds/posts/default"
-									  :add '(science)))
-		(add-hook 'elfeed-new-entry-hook
-				  (elfeed-make-tagger :feed-url "http://bair.berkeley.edu/blog/feed.xml"
-									  :add '(ml)))
-		(add-hook 'elfeed-new-entry-hook
-				  (elfeed-make-tagger :feed-url "https://deepmind.com/blog/feed/basic/"
-									  :add '(ml)))
-  
-		(defadvice elfeed-search-update (before nullprogram activate)
-		  (let ((feed (elfeed-db-get-feed "https://deepmind.com/blog/feed/basic/")))
-			(setf (elfeed-feed-title feed) "DeepMind")))
-		)
-	  )
-  #+END_SRC
-
 * Ibuffer
   #+BEGIN_SRC emacs-lisp
 	(global-set-key (kbd "C-x C-b") 'ibuffer)
@@ -299,6 +211,7 @@
     (global-set-key (kbd "C-c r") 'switch-remote)
 
   #+END_SRC
+
 * Nsh
   #+BEGIN_SRC emacs-lisp
 	;; Emacs, please load my new powerful nsh function
@@ -322,44 +235,14 @@
     ;; (load-theme 'modus-operandi t)
 
   #+END_SRC
-* Anaconda
-  #+BEGIN_SRC emacs-lisp
-    (use-package anaconda-mode
-      :ensure t
-      :commands anaconda-mode
-      :diminish anaconda-mode
-      :init
-      (progn
-	(add-hook 'python-mode-hook 'anaconda-mode)
-	(add-hook 'python-mode-hook 'eldoc-mode)))
-  #+END_SRC
-  #+BEGIN_SRC emacs-lisp
-    (use-package conda
-      :ensure t
-      :init
-      (progn
-	(require 'conda)
-	;; if you want interactive shell support, include:
-	(conda-env-initialize-interactive-shells)
-	;; if you want eshell support, include:
-	(conda-env-initialize-eshell)
-	;; if you want auto-activation (see below for details), include:
-	(conda-env-autoactivate-mode t)
-	;(setq conda-env-home-directory (expand-file-name "~/anaconda3/envs")
-	;;(setq conda-env-home-directory (expand-file-name "/Users/hunternisonoff/anaconda3/")
-        (setq conda-env-home-directory (expand-file-name "~/anaconda3/")
-	)
-      (custom-set-variables
-       '(conda-anaconda-home "~/anaconda3"))
-    ))
-    (setenv "WORKON_HOME" "~/anaconda3/envs")
-  #+END_SRC
+
 * Auctex
   #+BEGIN_SRC emacs-lisp
     (use-package tex-mode
       :ensure auctex
     )
   #+END_SRC
+
 * Exec path from shell
   #+BEGIN_SRC emacs-lisp
     (use-package exec-path-from-shell
@@ -425,6 +308,7 @@
 
 
   #+END_SRC
+
 * Python Tab
   #+BEGIN_SRC emacs-lisp
   (add-hook 'python-mode-hook
@@ -437,7 +321,7 @@
   #+BEGIN_SRC emacs-lisp
   (defun hpserver ()
   (interactive)
-  (find-file "/ssh:hunter_nisonoff@beef.bair.berkeley.edu:/home/hunter_nisonoff"))
+  (find-file "/ssh:hunter_nisonoff@beef2.bair.berkeley.edu:/home/hunter_nisonoff"))
   (global-set-key (kbd "C-c h") 'hpserver)
   
   
@@ -479,22 +363,12 @@
   #+END_SRC
 * Emacs Ipython Notebook
   #+BEGIN_SRC emacs-lisp
-	(use-package ein
-	  :ensure t
-	  :demand t
-	  :config
-	  (progn
-	  (require 'ein)
-	  ;;(setq ein:polymode t)
-          (setq ein:notebook-autosave-frequency 600)
-          ;;(setq ein:output-area-inlined-images t)
-		;;(setq ein:use-smartrep t)
-		;;(setq ein:complete-on-dot nil)
-		;;(setq ein:notebook-create-checkpoint-on-save t)
-		
-		;;(setqe ein:console-args '("--ssh" "nisonoff@drdlogin0061.en.desres.deshaw.com"))
-		)
-	)
+    (use-package ein
+      :ensure t
+    )
+    (setq ein:output-area-inlined-images t)
+    ;; (custom-set-variables
+    ;;  '(ein:output-area-inlined-images t))
   #+END_SRC    
 * Eglot
   #+BEGIN_SRC emacs-lisp
@@ -505,38 +379,197 @@
   #+END_SRC
 * Command is meta
   #+BEGIN_SRC emacs-lisp
-    (setq mac-command-modifier 'meta)
+  (setq mac-option-modifier 'meta)
+  (setq mac-command-modifier 'meta)
   #+END_SRC
+* SCF Cluster
+  #+begin_src emacs-lisp
+    (defun scfcluster ()
+      (interactive)
+      (find-file "/ssh:hunter_nisonoff@radagast.berkeley.edu:")
+    )
+  #+end_src
 * LSP Mode
   #+BEGIN_SRC emacs-lisp
-    ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
-    (setq lsp-keymap-prefix "s-l")
+      (use-package lsp-julia
+          :ensure t
+          :config
+          (setq lsp-julia-default-environment "~/.julia/environments/v1.5"))
+       ;; Set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
+       (setq lsp-keymap-prefix "s-l")
 
-    (use-package lsp-mode
-        :hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
-                (python-mode . lsp)
-                ;; if you want which-key integration
-                (lsp-mode . lsp-enable-which-key-integration))
-        :commands lsp)
+       (use-package lsp-mode
+           :hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
+                   (python-mode . lsp)
+                   (julia-mode . lsp-julia)
+                   ;; if you want which-key integration
+                   (lsp-mode . lsp-enable-which-key-integration))
+           :commands lsp)
 
-    ;; optionally
-    (use-package lsp-ui :commands lsp-ui-mode)
-    ;; if you are helm user
-    (use-package helm-lsp :commands helm-lsp-workspace-symbol)
-    ;; if you are ivy user
-    (use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
-    (use-package lsp-treemacs :commands lsp-treemacs-errors-list)
+       ;; optionally
+       (use-package lsp-ui :commands lsp-ui-mode)
+       ;; if you are helm user
+       (use-package helm-lsp :commands helm-lsp-workspace-symbol)
+       ;; if you are ivy user
+       (use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
+       (use-package lsp-treemacs :commands lsp-treemacs-errors-list)
 
-    ;; optional if you want which-key integration
-    (use-package which-key
-        :config
-        (which-key-mode))
+       ;; optional if you want which-key integration
+       (use-package which-key
+           :config
+           (which-key-mode))
 
-    (use-package lsp-python-ms
-      :ensure t
-      :init (setq lsp-python-ms-auto-install-server t)
-      :hook (python-mode . (lambda ()
-                              (require 'lsp-python-ms)
-                              (lsp))))  ; or lsp-deferred
+       (use-package lsp-python-ms
+         :ensure t
+         :init (setq lsp-python-ms-auto-install-server t)
+         :hook (python-mode . (lambda ()
+                                 (require 'lsp-python-ms)
+                                 (lsp))))  ; or lsp-deferred
+
+    (setq tab-always-indent 'complete)
   #+END_SRC
   
+* Org Mode
+  #+begin_src emacs-lisp
+    (setq org-agenda-files '("~/.emacs.d/orgfiles/work.org"
+                                    "~/.emacs.d/orgfiles/private.org"))
+    (defun org-focus-private() "Set focus on private things."
+           (interactive)
+           (setq org-agenda-files '("~/.emacs.d/orgfiles/private.org")))
+    (defun org-focus-work() "Set focus on work things."
+           (interactive)
+           (setq org-agenda-files '("~/.emacs.d/orgfiles/work.org")))
+    (defun org-focus-all() "Set focus on all things."
+           (interactive)
+           (setq org-agenda-files '("~/.emacs.d/orgfiles/work.org"
+                                    "~/.emacs.d/orgfiles/private.org")))
+    (custom-set-variables
+     '(org-capture-templates
+          '(("b" "Add book to read" entry (file+headline "~/.emacs.d/orgfiles/private.org" "Books to read")
+             (file "~/.emacs.d/orgfiles/tpl-book.txt")
+             :empty-lines-after 2)
+            ("p" "Add paper to read" entry (file+headline "~/.emacs.d/orgfiles/work.org" "Papers To Read")
+             (file "~/.emacs.d/orgfiles/tpl-papers.txt"))
+            ("i" "Add research idea" entry (file+headline "~/.emacs.d/orgfiles/work.org" "Research Ideas")
+             (file "~/.emacs.d/orgfiles/tpl-idea.txt"))
+            ("t" "Add todo" entry (file "~/.emacs.d/orgfiles/capture.org")
+             (file "~/.emacs.d/orgfiles/tpl-task.txt"))
+            ("c" "Add code" entry (file "~/.emacs.d/orgfiles/code.org")
+             (file "~/.emacs.d/orgfiles/tpl-code.txt"))
+            ))
+     '(org-directory "~/.emacs.d/orgfiles/")
+     '(org-outline-path-complete-in-steps nil)
+     '(org-refile-allow-creating-parent-nodes t)
+     '(org-refile-targets '((org-agenda-files :maxlevel . 2)))
+     '(org-refile-use-outline-path 'file)
+     )
+  #+end_src
+* Tramp
+  #+begin_src emacs-lisp
+    (setq explicit-shell-file-name "/bin/bash")
+  #+end_src
+* Anaconda
+  #+BEGIN_SRC emacs-lisp
+    (use-package anaconda-mode
+      :ensure t
+      :commands anaconda-mode
+      :diminish anaconda-mode
+      :init
+      (progn
+	(add-hook 'python-mode-hook 'anaconda-mode)
+	(add-hook 'python-mode-hook 'eldoc-mode)))
+  #+END_SRC
+  #+BEGIN_SRC emacs-lisp
+    (use-package conda
+      :ensure t
+      :init
+      (progn
+        (require 'conda)
+        (if (cl-search "pascal" system-name)
+            (custom-set-variables
+             '(conda-anaconda-home (expand-file-name "/usr/workspace/nisonoff/anaconda3/")))
+          (if (cl-search "beef2" system-name)
+              (custom-set-variables
+               '(conda-anaconda-home (expand-file-name "/anaconda3/")))
+            ;;; not pascal or beef2
+            (custom-set-variables
+             '(conda-anaconda-home (expand-file-name "~/anaconda3/")))
+              )
+          )
+        (conda-env-initialize-interactive-shells)
+        (conda-env-autoactivate-mode t)
+        (conda-env-initialize-eshell)
+        ))
+    ;;(setq conda-env-home-directory (expand-file-name "~/anaconda3/"))
+  #+END_SRC
+* Elisp
+  #+begin_src emacs-lisp
+  ;;(require 'ielm)
+  ;;(add-hook 'emacs-lisp-mode-hook 'ielm-auto-complete)
+  #+end_src
+* Ido Mode (Overriden by Swiper)
+  #+BEGIN_SRC emacs-lisp
+    (ido-mode 1)
+    (setq ido-enable-flex-matching t)
+    (setq ido-everywhere t)
+    (defalias 'list-buffers 'ibuffer)
+  #+END_SRC
+* ShellCheck
+  #+begin_src emacs-lisp
+  (add-hook 'sh-mode-hook 'flycheck-mode)
+  #+end_src
+* PDF TOols
+  #+begin_src emacs-lisp
+    (use-package pdf-tools
+      :ensure t
+      :pin manual ;; don't reinstall when package updates
+      :mode  ("\\.pdf\\'" . pdf-view-mode)
+      :config
+      ;;(setq-default pdf-view-display-size 'fit-page)
+      (setq pdf-annot-activate-created-annotations t)
+      (pdf-tools-install :no-query)
+      (setq pdf-view-use-scaling t
+            pdf-view-use-imagemagick nil)
+      (require 'pdf-occur))
+  #+end_src
+* Copy Remote Emacs
+  #+begin_src emacs-lisp
+    (use-package clipetty
+      :ensure t
+      :hook (after-init . global-clipetty-mode))
+  #+end_src
+* Org Roam
+  #+begin_src emacs-lisp
+    (use-package org-roam
+      :ensure t
+      :init
+      (setq org-roam-v2-ack t)
+      :custom
+      (org-roam-directory "/Users/hunternisonoff/Box Sync/PersonalProjects/orgroam")
+      :bind (("C-c n l" . org-roam-buffer-toggle)
+             ("C-c n f" . org-roam-noad-find)
+             ("C-c n i" . org-roam-noad-insert))
+      :config
+      (org-roam-setup))
+  #+end_src
+
+* Elpy
+  #+begin_src emacs-lisp
+    (use-package elpy
+      :ensure t
+      :init
+      (elpy-enable))
+
+    (setq python-shell-interpreter "ipython"
+          python-shell-interpreter-args "-i --simple-prompt")
+
+    (when (load "flycheck" t t)
+      (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
+      (add-hook 'elpy-mode-hook 'flycheck-mode))
+
+    (add-hook 'elpy-mode-hook (lambda ()
+                                (add-hook 'before-save-hook
+                                          'elpy-format-code nil t)))
+  #+end_src
+
+

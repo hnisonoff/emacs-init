@@ -3,3 +3,15 @@
   #+BEGIN_SRC bash
     git pull --rebase --autostash
   #+END_SRC
+* Find largest files
+  #+begin_src bash
+  du -hs * | sort -rh | head -20
+  #+end_src
+* Find file ending in something that you created x days ago:
+  #+begin_src bash
+  find . -name '*.pptx' -newermt 2021-01-01 -type f -print
+  #+end_src
+* Pytorch Lightning
+  #+begin_src python
+    final_spearman = [x['spearman'] for x in trainer.logger.experiment.metrics if 'spearman' in x][-1]
+  #+end_src

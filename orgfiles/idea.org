@@ -1,42 +1,10 @@
-* QP solver layer with FastROCs like functionality
-* 1/21/19
-  - [ ] Add MDS-like loss for jaccard metric to be preserved in latent space
-  - [ ] Counts / Generative -> only generative leads to unbiased results
-  - [ ] Causal direction C->E means SSL does not help, E->C means it does
-    - Self-supervision / Semi-supervision work by focussing attention causal variables
-      - Representation learning?
-  - [ ] Confounding in chemistry
-    - maybe finding ways other than scaffold to split the data?
-    - 
-  - [ ] Atom
-    - Graph Conv vs. Graph Message Passing
-    - Stratified Cross-Validation
-    - Pearson-Correlation
-* 2/3/19
-** Chemistry
-   - How to represent chiral molecules (lift 2D graph)
-   - Add MDS-like loss for jaccard metric to be preserved in latent space
-   - Add MDS-like loss for property metric to be preserved in latent space
-   - Confounders? Limited data? Semi-supervised learning
-     - Stratified Cross-validation
-     - Pearson-Correlation
-** Biology 
-   -
-** General
-   - Likelihood ratios, stat-mech, discriminative vs generative modeling
-   - 
-* MCMC
-  - Learning proposal distributions
+* Meta Learning
+** Mode Connectivity
+   https://arxiv.org/abs/2010.04495
+* Active Learning
+** Attribution methods + counterfactuals
+* Conformal Inference
 
-    
-* John
-  - Generative models
-    - Reverse KL divergence
-    - Joint likelihood useful?
-
-  - Are you using the richness of your representation
-  - Intrinsic vs Extrinsic dimensionality 
-
-* Knockoffs
-* PPI
-  - https://www.nature.com/articles/s41586-020-2188-x?WT.ec_id=NATURE-20200416&utm_source=nature_etoc&utm_medium=email&utm_campaign=20200416&sap-outbound-id=61F73631F0EAABA905C3A6CD652F1ADD1D97315F
+* Michael Jordan paper + Multiple Label EM algorithm
+* Pairwise Epistasis is sufficient -- Popgen view??
+* 

@@ -1,5 +1,0 @@
-* Talks
-  - vector institute
-  - Everything at Once: Python's Many Concurrency Models
-  - 
-  
