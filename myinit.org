@@ -391,42 +391,44 @@
   #+end_src
 * LSP Mode
   #+BEGIN_SRC emacs-lisp
-      (use-package lsp-julia
-          :ensure t
-          :config
-          (setq lsp-julia-default-environment "~/.julia/environments/v1.5"))
-       ;; Set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
-       (setq lsp-keymap-prefix "s-l")
+    (use-package lsp-mode
+      :ensure t
+      :hook ((python-mode) . lsp-deferred) ; XYZ are to be replaced by python, c++, etc.
+      :commands lsp)
 
-       (use-package lsp-mode
-           :hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
-                   (python-mode . lsp)
-                   (julia-mode . lsp-julia)
-                   ;; if you want which-key integration
-                   (lsp-mode . lsp-enable-which-key-integration))
-           :commands lsp)
+    (use-package lsp-ui
+      :ensure t
+      :commands lsp-ui-mode)
 
-       ;; optionally
-       (use-package lsp-ui :commands lsp-ui-mode)
-       ;; if you are helm user
-       (use-package helm-lsp :commands helm-lsp-workspace-symbol)
-       ;; if you are ivy user
-       (use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
-       (use-package lsp-treemacs :commands lsp-treemacs-errors-list)
+    (use-package lsp-ui
+      :commands lsp-ui-mode
+      :ensure t
+      :config
+      (setq lsp-ui-doc-enable nil)
+      (setq lsp-ui-doc-header t)
+      (setq lsp-ui-doc-include-signature t)
+      (setq lsp-ui-doc-border (face-foreground 'default))
+      (setq lsp-ui-sideline-show-code-actions t)
+      (setq lsp-ui-sideline-delay 0.05))
 
-       ;; optional if you want which-key integration
-       (use-package which-key
-           :config
-           (which-key-mode))
+    (use-package lsp-ivy
+      :ensure t)
 
-       (use-package lsp-python-ms
-         :ensure t
-         :init (setq lsp-python-ms-auto-install-server t)
-         :hook (python-mode . (lambda ()
-                                 (require 'lsp-python-ms)
-                                 (lsp))))  ; or lsp-deferred
+    (use-package company
+      :ensure t
+      :after lsp-mode
+      :hook (lsp-mode . company-mode)
+      :bind (:map company-active-map
+             ("<tab>" . company-complete-selection))
+            (:map lsp-mode-map
+             ("<tab>" . company-indent-or-complete-common))
+      :custom
+      (company-minimum-prefix-length 1)
+      (company-idle-delay 0.0))
 
-    (setq tab-always-indent 'complete)
+    (use-package company-box
+      :ensure t
+      :hook (company-mode . company-box-mode))
   #+END_SRC
   
 * Org Mode
@@ -487,13 +489,16 @@
         (require 'conda)
         (if (cl-search "pascal" system-name)
             (custom-set-variables
-             '(conda-anaconda-home (expand-file-name "/usr/workspace/nisonoff/anaconda3/")))
+             '(conda-anaconda-home (expand-file-name "/usr/workspace/nisonoff/anaconda3/"))
+             '(conda-env-home-directory (expand-file-name "/usr/workspace/nisonoff/anaconda3/")))
           (if (cl-search "beef2" system-name)
               (custom-set-variables
-               '(conda-anaconda-home (expand-file-name "/anaconda3/")))
+               '(conda-anaconda-home (expand-file-name "/anaconda3/"))
+               '(conda-env-home-directory (expand-file-name "/anaconda3/")))
             ;;; not pascal or beef2
             (custom-set-variables
-             '(conda-anaconda-home (expand-file-name "~/anaconda3/")))
+             '(conda-anaconda-home (expand-file-name "~/anaconda3/"))
+             '(conda-env-home-directory (expand-file-name "~/anaconda3/")))
               )
           )
         (conda-env-initialize-interactive-shells)
@@ -520,17 +525,22 @@
   #+end_src
 * PDF TOols
   #+begin_src emacs-lisp
-    (use-package pdf-tools
-      :ensure t
-      :pin manual ;; don't reinstall when package updates
-      :mode  ("\\.pdf\\'" . pdf-view-mode)
-      :config
-      ;;(setq-default pdf-view-display-size 'fit-page)
-      (setq pdf-annot-activate-created-annotations t)
-      (pdf-tools-install :no-query)
-      (setq pdf-view-use-scaling t
-            pdf-view-use-imagemagick nil)
-      (require 'pdf-occur))
+    ;; (if (cl-search "pascal" system-name)
+    ;;     ()
+    ;;   (if (cl-search "beef2" system-name)
+    ;;       ()
+    ;;     ;;; if not in pascal or beef
+    ;;     (use-package pdf-tools
+    ;;       :ensure t
+    ;;       :pin manual ;; don't reinstall when package updates
+    ;;       :mode  ("\\.pdf\\'" . pdf-view-mode)
+    ;;       :config
+    ;;       ;;(setq-default pdf-view-display-size 'fit-page)
+    ;;       (setq pdf-annot-activate-created-annotations t)
+    ;;       (pdf-tools-install :no-query)
+    ;;       (setq pdf-view-use-scaling t
+    ;;             pdf-view-use-imagemagick nil)
+    ;;       (require 'pdf-occur))))
   #+end_src
 * Copy Remote Emacs
   #+begin_src emacs-lisp
@@ -555,21 +565,30 @@
 
 * Elpy
   #+begin_src emacs-lisp
-    (use-package elpy
-      :ensure t
-      :init
-      (elpy-enable))
+    ;; (use-package elpy
+    ;;   :ensure t
+    ;;   :init
+    ;;   (elpy-enable))
 
     (setq python-shell-interpreter "ipython"
           python-shell-interpreter-args "-i --simple-prompt")
 
-    (when (load "flycheck" t t)
-      (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
-      (add-hook 'elpy-mode-hook 'flycheck-mode))
+    ;; (when (load "flycheck" t t)
+    ;;   (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
+    ;;   (add-hook 'elpy-mode-hook 'flycheck-mode))
 
-    (add-hook 'elpy-mode-hook (lambda ()
-                                (add-hook 'before-save-hook
-                                          'elpy-format-code nil t)))
+    ;; (add-hook 'elpy-mode-hook (lambda ()
+    ;;                             (add-hook 'before-save-hook
+    ;;                                       'elpy-format-code nil t)))
   #+end_src
 
 
+
+* Yapfify  
+   #+begin_src emacs-lisp
+    (use-package yapfify
+      :ensure t
+      )
+    (add-hook 'python-mode-hook 'yapf-mode)
+
+  #+end_src
