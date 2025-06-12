@@ -1,5 +1,4 @@
 #+STARTUP: overview
-
 * Package Management
   #+BEGIN_SRC emacs-lisp
     ;; Initialize package system
@@ -268,3 +267,4 @@
       (add-hook 'LaTeX-mode-hook 'turn-on-reftex)
       (setq reftex-plug-into-AUCTeX t))
   #+end_src
+ 

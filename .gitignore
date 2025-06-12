@@ -6,6 +6,8 @@
 !orgfiles/**
 !.gitignore
 !init.el
+!elpa/
+!elpa/**
 !myinit.org
 !huntercode
 !huntercode/**
